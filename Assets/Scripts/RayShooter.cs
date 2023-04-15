@@ -6,6 +6,10 @@ public class RayShooter : MonoBehaviour
 {
     private Camera cam;
 
+    [SerializeField] AudioSource soundSource;
+    [SerializeField] AudioClip hitWallSound;
+    [SerializeField] AudioClip hitEnemySound;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -38,10 +42,12 @@ public class RayShooter : MonoBehaviour
                 if (target != null)
                 {
                     target.ReactToHit();
+                    soundSource.PlayOneShot(hitEnemySound);
                 }
                 else
                 {
                     StartCoroutine(SphereIndicator(hit.point));
+                    soundSource.PlayOneShot(hitWallSound);
                 }
             }
         }
