@@ -11,10 +11,23 @@ public class AudioManager : MonoBehaviour, IGameManager
         get; private set;
     }
 
+    public float SoundVolume
+    {
+        get => AudioListener.volume;
+        set => AudioListener.volume = value;
+    }
+
+    public bool SoundMute
+    {
+        get => AudioListener.pause;
+        set => AudioListener.pause = value;
+    }
+
     public void Startup(NetworkService service)
     {
         Debug.Log("Audio manager starting...");
         networkService = service;
+        SoundVolume = 1f;
         Status = ManagerStatus.Started;
     }
 
