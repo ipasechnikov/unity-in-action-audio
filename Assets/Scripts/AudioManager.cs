@@ -6,6 +6,8 @@ public class AudioManager : MonoBehaviour, IGameManager
 {
     private NetworkService networkService;
 
+    [SerializeField] AudioSource soundSource;
+
     public ManagerStatus Status
     {
         get; private set;
@@ -31,15 +33,8 @@ public class AudioManager : MonoBehaviour, IGameManager
         Status = ManagerStatus.Started;
     }
 
-    // Start is called before the first frame update
-    void Start()
+    public void PlaySound(AudioClip audioClip)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        soundSource.PlayOneShot(audioClip);
     }
 }
