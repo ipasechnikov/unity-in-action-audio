@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,5 +16,23 @@ public class SettingsPopup : MonoBehaviour
     public void OnSoundValue(float value)
     {
         Managers.Audio.SoundVolume = value;
+    }
+
+    public void OnPlayMusic(int selector)
+    {
+        switch (selector)
+        {
+            case 1:
+                Managers.Audio.PlayIntroMusic();
+                break;
+            case 2:
+                Managers.Audio.PlayLevelMusic();
+                break;
+            case 3:
+                Managers.Audio.StopMusic();
+                break;
+            default:
+                throw new NotSupportedException();
+        }
     }
 }

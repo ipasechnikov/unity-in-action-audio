@@ -7,6 +7,10 @@ public class AudioManager : MonoBehaviour, IGameManager
     private NetworkService networkService;
 
     [SerializeField] AudioSource soundSource;
+    [SerializeField] AudioSource music1Source;
+
+    [SerializeField] string introBGMusic;
+    [SerializeField] string levelBGMusic;
 
     public ManagerStatus Status
     {
@@ -36,5 +40,28 @@ public class AudioManager : MonoBehaviour, IGameManager
     public void PlaySound(AudioClip audioClip)
     {
         soundSource.PlayOneShot(audioClip);
+    }
+
+    public void PlayMusic(AudioClip musicClip)
+    {
+        music1Source.clip = musicClip;
+        music1Source.Play();
+    }
+
+    public void StopMusic()
+    {
+        music1Source.Stop();
+    }
+
+    public void PlayIntroMusic()
+    {
+        var introMusicClip = Resources.Load($"Music/{introBGMusic}") as AudioClip;
+        PlayMusic(introMusicClip);
+    }
+
+    public void PlayLevelMusic()
+    {
+        var levelMusicClip = Resources.Load($"Music/{levelBGMusic}") as AudioClip;
+        PlayMusic(levelMusicClip);
     }
 }
