@@ -8,9 +8,16 @@ public class AudioManager : MonoBehaviour, IGameManager
 
     [SerializeField] AudioSource soundSource;
     [SerializeField] AudioSource music1Source;
+    [SerializeField] AudioSource music2Source;
 
     [SerializeField] string introBGMusic;
     [SerializeField] string levelBGMusic;
+
+    private AudioSource activeMusic;
+    private AudioSource inactiveMusic;
+
+    public float crossFadeRate = 1.5f;
+    private bool crossFading;
 
     public ManagerStatus Status
     {
@@ -30,8 +37,11 @@ public class AudioManager : MonoBehaviour, IGameManager
         set
         {
             _musicVolume = value;
-            if (music1Source != null)
+            if (music1Source != null && !crossFading)
+            {
                 music1Source.volume = _musicVolume;
+                music2Source.volume = _musicVolume;
+            }
         }
     }
 
@@ -52,7 +62,10 @@ public class AudioManager : MonoBehaviour, IGameManager
         set
         {
             if (music1Source != null)
+            {
                 music1Source.mute = value;
+                music2Source.mute = value;
+            }
         }
     }
 
@@ -63,10 +76,15 @@ public class AudioManager : MonoBehaviour, IGameManager
         networkService = service;
 
         music1Source.ignoreListenerVolume = true;
+        music2Source.ignoreListenerVolume = true;
         music1Source.ignoreListenerPause = true;
+        music2Source.ignoreListenerPause = true;
 
         SoundVolume = 1f;
         MusicVolume = 1f;
+
+        activeMusic = music1Source;
+        inactiveMusic = music2Source;
 
         Status = ManagerStatus.Started;
     }
@@ -78,13 +96,16 @@ public class AudioManager : MonoBehaviour, IGameManager
 
     public void PlayMusic(AudioClip musicClip)
     {
-        music1Source.clip = musicClip;
-        music1Source.Play();
+        if (crossFading)
+            return;
+
+        StartCoroutine(CrossFadeMusic(musicClip));
     }
 
     public void StopMusic()
     {
-        music1Source.Stop();
+        activeMusic.Stop();
+        inactiveMusic.Stop();
     }
 
     public void PlayIntroMusic()
@@ -97,5 +118,34 @@ public class AudioManager : MonoBehaviour, IGameManager
     {
         var levelMusicClip = Resources.Load($"Music/{levelBGMusic}") as AudioClip;
         PlayMusic(levelMusicClip);
+    }
+
+    private IEnumerator CrossFadeMusic(AudioClip musicClip)
+    {
+        crossFading = true;
+
+        inactiveMusic.clip = musicClip;
+        inactiveMusic.volume = 0;
+        inactiveMusic.Play();
+
+        var scaledRate = crossFadeRate * MusicVolume;
+        while (activeMusic.volume > 0)
+        {
+            activeMusic.volume -= scaledRate * Time.deltaTime;
+            inactiveMusic.volume += scaledRate * Time.deltaTime;
+
+            // Yield statement pauses for one frame
+            yield return null;
+        }
+
+        var temp = activeMusic;
+
+        activeMusic = inactiveMusic;
+        activeMusic.volume = MusicVolume;
+
+        inactiveMusic = temp;
+        inactiveMusic.Stop();
+
+        crossFading = false;
     }
 }
